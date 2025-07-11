@@ -1,8 +1,8 @@
 const { ProfileModel } = require('../../models/index');
 const Joi = require('joi');
-const { v4: uuidV4 } = require('uuid');
 
 const profileSchema = Joi.object({
+    id: Joi.string().optional(),
     creatorId: Joi.alternatives().try(Joi.string(), Joi.number().integer()).required(),
     displayName: Joi.string().allow(null, '').optional(),
     bio: Joi.string().allow(null, '').optional(),
@@ -16,7 +16,6 @@ const updateProfileSchema = profileSchema.keys({ id: Joi.string().required() });
 const create = async (req, res) => {
     const { error, value } = profileSchema.validate(req.body);
     if (error) return res.status(400).json({ status: false, message: error.message });
-    const generatedId = uuidV4();
     try {
         // const profile = await ProfileModel.create({ ...value, id: generatedId });
         const profile = await ProfileModel.create(value);
@@ -42,6 +41,7 @@ const getProfile = async (req, res) => {
 const update = async (req, res) => {
     const { error, value } = updateProfileSchema.validate(req.body);
     if (error) return res.status(400).json({ status: false, message: error.message });
+    console.log("req.body =>", req.body);
 
     try {
         const profile = await ProfileModel.findById(value.id);

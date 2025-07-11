@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const ProductSchema = new mongoose.Schema({
-    id: { type: String, default: uuidv4, unique: true },
     productId: { type: String, default: null },
     title: { type: String, default: null },
     description: { type: String, default: null },
@@ -14,4 +12,13 @@ const ProductSchema = new mongoose.Schema({
     collection: 'product'
 });
 
+// ✅ Convert _id → id automatically in all JSON responses
+ProductSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+    }
+});
 module.exports = mongoose.model('Product', ProductSchema);

@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const ReactionSchema = new mongoose.Schema({
-    id: { type: String, default: uuidv4, unique: true },
     movieId: { type: String, default: null },
     userId: { type: String, default: null },
     name: { type: String, default: null }
@@ -11,4 +9,13 @@ const ReactionSchema = new mongoose.Schema({
     collection: 'reaction'
 });
 
+// ✅ Convert _id → id automatically in all JSON responses
+ReactionSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+    }
+});
 module.exports = mongoose.model('Reaction', ReactionSchema);

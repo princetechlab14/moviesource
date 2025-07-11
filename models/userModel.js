@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const UserSchema = new mongoose.Schema({
-    id: { type: String, default: uuidv4, unique: true },
     userName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
@@ -12,4 +10,13 @@ const UserSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// ✅ Convert _id → id automatically in all JSON responses
+UserSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+    }
+});
 module.exports = mongoose.model('User', UserSchema);

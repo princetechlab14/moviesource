@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const StripeAccountSchema = new mongoose.Schema({
-    id: { type: String, default: uuidv4, unique: true },
     accountId: { type: String, default: null },
     defaultCurrency: { type: String, default: null }
 }, {
@@ -10,4 +8,13 @@ const StripeAccountSchema = new mongoose.Schema({
     collection: 'stripe_account'
 });
 
+// ✅ Convert _id → id automatically in all JSON responses
+StripeAccountSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+    }
+});
 module.exports = mongoose.model('StripeAccount', StripeAccountSchema);

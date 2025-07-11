@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const NewsSchema = new mongoose.Schema({
-    id: { type: String, default: uuidv4, unique: true },
     creatorId: { type: String, default: null },
     title: { type: String, default: null },
     description: { type: String, default: null },
@@ -20,4 +18,13 @@ const NewsSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// ✅ Convert _id → id automatically in all JSON responses
+NewsSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+    }
+});
 module.exports = mongoose.model('News', NewsSchema);

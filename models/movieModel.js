@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
 
 const MovieSchema = new mongoose.Schema({
-    id: { type: String, default: uuidv4, unique: true },
     creatorId: { type: String, default: null },
     title: { type: String, default: null },
     description: { type: String, default: null },
@@ -22,4 +20,13 @@ const MovieSchema = new mongoose.Schema({
     timestamps: true // createdAt & updatedAt
 });
 
+// ✅ Convert _id → id automatically in all JSON responses
+MovieSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        ret.id = ret._id;
+        delete ret._id;
+    }
+});
 module.exports = mongoose.model('Movie', MovieSchema);

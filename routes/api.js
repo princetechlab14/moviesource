@@ -21,7 +21,7 @@ router.post('/user/signin', userController.SignIn);
 
 // ProfileService
 router.post('/profile/create', authenticateToken, profileController.create);
-router.put('/profile/update', authenticateToken, profileController.update);
+router.post('/profile/update', authenticateToken, profileController.update);
 router.get('/profile/:creatorId', authenticateToken, profileController.getProfile);
 router.post('/profile/upload/:id', upload.single('profileImageUrl'), authenticateToken, profileController.uploadPicture);
 
