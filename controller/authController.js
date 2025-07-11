@@ -1,4 +1,4 @@
-const { AdminModel } = require('../models');
+const { AdminModel } = require('../models/index');
 const { generateHashPassword, passwordCompare, generateToken } = require('../services/passwordUtils');
 
 const getRegister = (req, res) => {
@@ -7,28 +7,39 @@ const getRegister = (req, res) => {
 
 const register = async (req, res) => {
     const { name, email, password, repeatPassword } = req?.body;
-    if (password !== repeatPassword) {
-        res.render("register", { title: "Register", error: "Password not mess and min 8 later length", oldVal: { name, email } });
-        return;
+
+    if (password !== repeatPassword || password.length < 8) {
+        return res.render("register", {
+            title: "Register",
+            error: "Password must match and be at least 8 characters.",
+            oldVal: { name, email }
+        });
     }
-    const hashPassword = await generateHashPassword(password, 8);
-    let obj = {
-        name, email, password: hashPassword
-    };
-    const userDetail = await AdminModel.findOne({ where: { email: email } });
-    if (!userDetail) {
-        try {
-            const data = await AdminModel.create(obj);
-            if (data) {
-                res.redirect("/admin/login");
-            } else {
-                res.render("register", { title: "Register", error: "Server error.", oldVal: { name, email } });
-            }
-        } catch (error) {
-            res.render("register", { title: "Register", error: "Email all ready exists.", oldVal: { name, email } });
+
+    try {
+        const existingUser = await AdminModel.findOne({ email });
+        if (existingUser) {
+            return res.render("register", {
+                title: "Register",
+                error: "Email already exists.",
+                oldVal: { name, email }
+            });
         }
-    } else {
-        res.render("register", { title: "Register", error: "Email all ready exists.", oldVal: { name, email } });
+        const hashPassword = await generateHashPassword(password, 8);
+        const newUser = new AdminModel({
+            name,
+            email,
+            password: hashPassword
+        });
+        await newUser.save();
+        res.redirect("/admin/login");
+    } catch (error) {
+        console.error("Register Error:", error);
+        res.render("register", {
+            title: "Register",
+            error: "Server error occurred.",
+            oldVal: { name, email }
+        });
     }
 };
 
@@ -38,23 +49,32 @@ const getLogin = (req, res) => {
 
 const login = async (req, res) => {
     const { email, password: pwd } = req?.body;
-    let query = {
-        where: { email: email, status: "Active" },
-        attributes: ["id", "name", "email", "password", "status"],
-    };
-
-    const userDetail = await AdminModel.findOne(query);
-    if (userDetail) {
-        let passwordValidate = await passwordCompare(pwd, userDetail.password);
-        const token = await generateToken(userDetail);
-        if (passwordValidate) {
-            res.cookie("_gmtls", token);
-            res.redirect("/admin/");
-        } else {
-            res.render("login", { title: "Login", error: "Credential not valid." });
+    try {
+        const user = await AdminModel.findOne({ email, status: "Active" }).select("id name email password status");
+        if (!user) {
+            return res.render("login", {
+                title: "Login",
+                error: "Credential not valid."
+            });
         }
-    } else {
-        res.render("login", { title: "Login", error: "Credential not valid." });
+
+        const isValid = await passwordCompare(pwd, user.password);
+        if (!isValid) {
+            return res.render("login", {
+                title: "Login",
+                error: "Credential not valid."
+            });
+        }
+
+        const token = await generateToken(user);
+        res.cookie("_gmtls", token);
+        res.redirect("/admin/");
+    } catch (err) {
+        console.error("Login Error:", err);
+        res.render("login", {
+            title: "Login",
+            error: "An error occurred during login."
+        });
     }
 };
 

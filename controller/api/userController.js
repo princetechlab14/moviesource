@@ -23,14 +23,15 @@ const SignUp = async (req, res) => {
 
         const { email, userName, password } = value;
 
-        const existingUser = await UserModel.findOne({ where: { email } });
+        const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
             return res.status(409).json({ message: 'Email already registered.' });
         }
 
         const hashedPassword = await hashPassword(password);
 
-        const newUser = await UserModel.create({ email, userName, password: hashedPassword });
+        const newUser = new UserModel({ email, userName, password: hashedPassword });
+        await newUser.save();
         const token = await generateJWTToken({ id: newUser.id, email, userName });
         return res.status(201).json({ userId: newUser.id, userName, token });
     } catch (err) {
