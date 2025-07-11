@@ -1,50 +1,23 @@
-module.exports = (sequelize, DataTypes) => {
-    const Cost = sequelize.define("cost", {
-        id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            autoIncrement: true,
-            primaryKey: true,
-        },
-        name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            defaultValue: '',
-        },
-        from: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        to: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        amount: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        videoId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        costType: {
-            type: DataTypes.ENUM('view', 'emoji', 'rent', 'buy'),
-            allowNull: false,
-            defaultValue: 'view',
-        },
-        date: {
-            type: DataTypes.DATE,
-            allowNull: true,
-            defaultValue: null
-        }
-    }, {
-        tableName: 'cost',
-        timestamps: false
-    });
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-    return Cost;
-};
+const CostSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    name: { type: String, required: true, default: '' },
+    from: { type: Number, required: true, default: 0 },
+    to: { type: Number, required: true, default: 0 },
+    amount: { type: Number, required: true, default: 0 },
+    videoId: { type: Number, required: true, default: 0 },
+    costType: {
+        type: String,
+        enum: ['view', 'emoji', 'rent', 'buy'],
+        required: true,
+        default: 'view'
+    },
+    date: { type: Date, default: null }
+}, {
+    collection: 'cost',
+    timestamps: false
+});
+
+module.exports = mongoose.model('Cost', CostSchema);

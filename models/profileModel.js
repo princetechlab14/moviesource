@@ -1,39 +1,17 @@
-module.exports = (sequelize, DataTypes) => {
-    const Profile = sequelize.define("profile", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        creatorId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        displayName: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        bio: {
-            type: DataTypes.TEXT,
-            allowNull: true
-        },
-        twitterId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        website: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        profileImageUrl: {
-            type: DataTypes.STRING,
-            allowNull: true
-        }
-    }, {
-        tableName: "profile",
-        timestamps: true
-    });
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-    return Profile;
-};
+const ProfileSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    creatorId: { type: String, default: null },
+    displayName: { type: String, default: null },
+    bio: { type: String, default: null },
+    twitterId: { type: String, default: null },
+    website: { type: String, default: null },
+    profileImageUrl: { type: String, default: null }
+}, {
+    timestamps: true,
+    collection: 'profile'
+});
+
+module.exports = mongoose.model('Profile', ProfileSchema);

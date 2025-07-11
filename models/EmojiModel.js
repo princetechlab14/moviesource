@@ -1,26 +1,14 @@
-module.exports = (sequelize, DataTypes) => {
-    const Emoji = sequelize.define("emoji", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        productId: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-        userId: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        name: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
-    }, {
-        tableName: 'emoji',
-        timestamps: false
-    });
-    return Emoji;
-};
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
+
+const EmojiSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    productId: { type: String, required: true },
+    userId: { type: String, default: null },
+    name: { type: String, required: true },
+}, {
+    collection: 'emoji',
+    timestamps: false
+});
+
+module.exports = mongoose.model('Emoji', EmojiSchema);

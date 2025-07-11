@@ -20,7 +20,7 @@ const getAll = async (req, res) => {
     if (!creatorId) return res.status(400).json({ message: 'Missing creatorId' });
 
     try {
-        const movies = await MovieModel.findAll({ where: { creatorId } });
+        const movies = await MovieModel.find({ creatorId });
         return res.status(200).json({ status: true, data: movies });
     } catch (e) {
         console.error("movies getAll =>", e);
@@ -33,7 +33,8 @@ const create = async (req, res) => {
     const { error, value } = movieSchema.validate(req.body);
     if (error) return res.status(400).json({ status: false, message: error.message });
     try {
-        const movie = await MovieModel.create(value);
+        const movie = new MovieModel(value);
+        await movie.save();
         return res.status(200).json({ status: true, data: movie });
     } catch (e) {
         console.error("Movie create error=>", e);
@@ -45,7 +46,7 @@ const create = async (req, res) => {
 const getById = async (req, res) => {
     const { id } = req.params;
     try {
-        const movie = await MovieModel.findByPk(id);
+        const movie = await MovieModel.findById(id);
         if (!movie) return res.status(404).json({ status: false, message: 'Movie not found' });
         return res.status(200).json({ status: true, data: movie });
     } catch (e) {
@@ -60,10 +61,8 @@ const update = async (req, res) => {
     if (error) return res.status(400).json({ status: false, message: error.message });
 
     try {
-        const movie = await MovieModel.findByPk(value.id);
+        const movie = await MovieModel.findByIdAndUpdate(value.id, value, { new: true });
         if (!movie) return res.status(404).json({ status: false, message: 'Movie Not Found' });
-
-        await movie.update(value);
         return res.status(200).json({ status: true, data: movie });
     } catch (e) {
         console.error("Movie update error =>", e);
@@ -87,7 +86,7 @@ const uploadMovie = async (req, res) => {
     const { movieId } = req.params;
 
     try {
-        const movies = await MovieModel.findByPk(movieId);
+        const movies = await MovieModel.findById(movieId);
         if (!movies) return res.status(404).json({ status: false, message: 'Movie Not found' });
         movies.originalUrl = req.file ? req.file.location : null;
         await movies.save();
@@ -102,7 +101,7 @@ const uploadMovie = async (req, res) => {
 const getThankYouMovie = async (req, res) => {
     const { userId } = req.params;
     try {
-        const movie = await MovieModel.findOne({ where: { creatorId: userId, isThankYou: true } });
+        const movie = await MovieModel.findOne({ creatorId: userId, isThankYou: true });
         if (!movie) return res.status(404).json({ message: 'Thank you movie not found' });
         res.status(200).json(movie);
     } catch (err) {
@@ -115,10 +114,8 @@ const deleteMovieById = async (id, res) => {
     if (!id) return res.status(400).json({ message: 'Missing id' });
 
     try {
-        const movie = await MovieModel.findByPk(id);
+        const movie = await MovieModel.findByIdAndDelete(id);
         if (!movie) return res.status(404).json({ message: "Movie not found" });
-
-        await movie.destroy();
         return res.status(200).json(true);
     } catch (err) {
         console.error("Delete Movie error:", err);
@@ -130,7 +127,7 @@ const deleteMovieById = async (id, res) => {
 const getAllMovies = async (req, res) => {
     const { creatorId } = req.params;
     try {
-        const movies = await MovieModel.findAll({ where: { creatorId } });
+        const movies = await MovieModel.find({ creatorId });
         res.status(200).json(movies);
     } catch (err) {
         console.error("Get All Movies Error:", err);
@@ -142,9 +139,7 @@ const getAllMovies = async (req, res) => {
 const getAllHighlights = async (req, res) => {
     const { creatorId } = req.params;
     try {
-        const highlights = await MovieModel.findAll({
-            where: { creatorId, isHighlight: true }
-        });;
+        const highlights = await MovieModel.find({ creatorId, isHighlight: true });
         res.status(200).json(highlights);
     } catch (err) {
         console.error("Get Highlights Error:", err);
@@ -156,7 +151,7 @@ const getAllHighlights = async (req, res) => {
 const getMyMovies = async (req, res) => {
     const { userId } = req.params;
     try {
-        const movies = await MovieModel.findOne({ where: { creatorId: userId } });
+        const movies = await MovieModel.findOne({ creatorId: userId });
         if (!movies) return res.status(404).json({ message: 'No movies found for user' });
         return res.status(200).json(movies);
     } catch (err) {

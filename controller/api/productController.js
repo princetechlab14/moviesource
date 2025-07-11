@@ -12,7 +12,7 @@ const getUserProducts = async (req, res) => {
     if (!userId) return res.status(400).json({ message: 'Missing userId' });
 
     try {
-        const products = await MyProductModel.findAll({ where: { userId } });
+        const products = await MyProductModel.find({ userId });
         return res.status(200).json(products);
     } catch (err) {
         console.error('Error fetching user products:', err);

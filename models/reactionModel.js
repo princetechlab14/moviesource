@@ -1,27 +1,14 @@
-module.exports = (sequelize, DataTypes) => {
-    const Reaction = sequelize.define("reaction", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        movieId: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        userId: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        name: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-    }, {
-        tableName: "reaction",
-        timestamps: true,
-    });
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-    return Reaction;
-};
+const ReactionSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    movieId: { type: String, default: null },
+    userId: { type: String, default: null },
+    name: { type: String, default: null }
+}, {
+    timestamps: true,
+    collection: 'reaction'
+});
+
+module.exports = mongoose.model('Reaction', ReactionSchema);

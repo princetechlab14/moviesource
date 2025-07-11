@@ -1,4 +1,4 @@
-const  UserModel = require('../../models/userModel');
+const { UserModel } = require('../../models/index');
 const Joi = require('joi');
 const { hashPassword, generateJWTToken, comparePassword } = require('../../services/passwordUtils');
 

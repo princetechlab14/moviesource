@@ -47,10 +47,11 @@ const updateReaction = async (req, res) => {
         const { id } = value;
         if (!id) return res.status(400).json({ message: 'Reaction ID is required' });
 
-        const reaction = await ReactionModel.findByPk(id);
+        const reaction = await ReactionModel.findById(id);
         if (!reaction) return res.status(404).json({ message: 'Reaction not found' });
 
-        await reaction.update(value);
+        Object.assign(reaction, value);
+        await reaction.save();
         return res.status(200).json({ success: true, reaction });
     } catch (err) {
         console.error('Update Reaction Error:', err);
@@ -64,10 +65,10 @@ const deleteReaction = async (req, res) => {
     if (!id) return res.status(400).json({ message: 'Reaction ID is required' });
 
     try {
-        const reaction = await ReactionModel.findByPk(id);
+        const reaction = await ReactionModel.findById(id);
         if (!reaction) return res.status(404).json({ message: 'Reaction not found' });
 
-        await reaction.destroy();
+        await reaction.deleteOne();
         return res.status(200).json({ success: true });
     } catch (err) {
         console.error('Delete Reaction Error:', err);

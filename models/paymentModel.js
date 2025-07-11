@@ -1,42 +1,17 @@
-module.exports = (sequelize, DataTypes) => {
-    const Payment = sequelize.define("payment", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        appProductId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        name: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        units: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: 0
-        },
-        price: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: 0
-        },
-        quantity: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: 1
-        },
-        userId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        }
-    }, {
-        tableName: "payment",
-        timestamps: true
-    });
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-    return Payment;
-};
+const PaymentSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    appProductId: { type: String, default: null },
+    name: { type: String, default: null },
+    units: { type: Number, default: 0 },
+    price: { type: Number, default: 0 },
+    quantity: { type: Number, default: 1 },
+    userId: { type: String, default: null }
+}, {
+    collection: "payment",
+    timestamps: true
+});
+
+module.exports = mongoose.model('Payment', PaymentSchema);

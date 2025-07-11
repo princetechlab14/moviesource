@@ -5,7 +5,7 @@ const getUserEmojis = async (req, res) => {
     if (!userId) return res.status(400).json({ error: 'Missing userId' });
 
     try {
-        const emojis = await EmojiModel.findAll({ where: { userId } });
+        const emojis = await EmojiModel.find({ userId });
         return res.status(200).json(emojis);
     } catch (err) {
         console.error('Error fetching emojis:', err);

@@ -1,55 +1,25 @@
-module.exports = (sequelize, DataTypes) => {
-    const Movie = sequelize.define("movie", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        creatorId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        title: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        description: {
-            type: DataTypes.TEXT,
-            allowNull: true
-        },
-        genre: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        category: {
-            type: DataTypes.ENUM("Movie", "Highlight", "Thank you"),
-            allowNull: true
-        },
-        keywords: {
-            type: DataTypes.JSON,
-            allowNull: true
-        },
-        originalUrl: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        hlsUrl: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        isThankYou: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
-        isHighlight: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        }
-    }, {
-        tableName: "movie",
-        timestamps: true
-    });
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-    return Movie;
-};
+const MovieSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    creatorId: { type: String, default: null },
+    title: { type: String, default: null },
+    description: { type: String, default: null },
+    genre: { type: String, default: null },
+    category: {
+        type: String,
+        enum: ["Movie", "Highlight", "Thank you"],
+        default: null
+    },
+    keywords: { type: [String], default: [] }, // equivalent to JSON array
+    originalUrl: { type: String, default: null },
+    hlsUrl: { type: String, default: null },
+    isThankYou: { type: Boolean, default: false },
+    isHighlight: { type: Boolean, default: false },
+}, {
+    collection: "movie",
+    timestamps: true // createdAt & updatedAt
+});
+
+module.exports = mongoose.model('Movie', MovieSchema);

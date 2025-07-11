@@ -1,24 +1,13 @@
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-module.exports = (sequelize, DataTypes) => {
-    const StripeAccount = sequelize.define("stripe_account", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        accountId: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        defaultCurrency: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        }
-    }, {
-        tableName: "stripe_account",
-        timestamps: false
-    });
+const StripeAccountSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    accountId: { type: String, default: null },
+    defaultCurrency: { type: String, default: null }
+}, {
+    timestamps: false,
+    collection: 'stripe_account'
+});
 
-    return StripeAccount;
-};
+module.exports = mongoose.model('StripeAccount', StripeAccountSchema);

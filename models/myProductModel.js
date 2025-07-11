@@ -1,28 +1,14 @@
-module.exports = (sequelize, DataTypes) => {
-    const MyProduct = sequelize.define("my_product", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        userId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        productId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        quantity: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: 1
-        }
-    }, {
-        tableName: "my_product",
-        timestamps: true
-    });
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-    return MyProduct;
-};
+const MyProductSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    userId: { type: String, default: null },
+    productId: { type: String, default: null },
+    quantity: { type: Number, default: 1 }
+}, {
+    collection: "my_product",
+    timestamps: true
+});
+
+module.exports = mongoose.model('MyProduct', MyProductSchema);

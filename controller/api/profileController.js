@@ -18,7 +18,8 @@ const create = async (req, res) => {
     if (error) return res.status(400).json({ status: false, message: error.message });
     const generatedId = uuidV4();
     try {
-        const profile = await ProfileModel.create({ ...value, id: generatedId });
+        // const profile = await ProfileModel.create({ ...value, id: generatedId });
+        const profile = await ProfileModel.create(value);
         return res.status(200).json(profile);
     } catch (e) {
         console.error("Profile create =>", e);
@@ -29,7 +30,7 @@ const create = async (req, res) => {
 const getProfile = async (req, res) => {
     const { creatorId } = req.params;
     try {
-        const profile = await ProfileModel.findOne({ where: { creatorId } });
+        const profile = await ProfileModel.findOne({ creatorId });
         if (!profile) return res.status(404).json({ status: false, message: 'Profile Not found' });
         return res.status(200).json(profile);
     } catch (e) {
@@ -43,10 +44,11 @@ const update = async (req, res) => {
     if (error) return res.status(400).json({ status: false, message: error.message });
 
     try {
-        const profile = await ProfileModel.findByPk(value.id);
+        const profile = await ProfileModel.findById(value.id);
         if (!profile) return res.status(404).json({ status: false, message: 'Profile Not found' });
 
-        await profile.update(value);
+        Object.assign(profile, value);
+        await profile.save();
         return res.status(200).json(profile);
     } catch (e) {
         console.error("Profile update =>", e);
@@ -57,7 +59,7 @@ const update = async (req, res) => {
 const uploadPicture = async (req, res) => {
     const { id } = req.params;
     try {
-        const profile = await ProfileModel.findByPk(id);
+        const profile = await ProfileModel.findById(id);
         if (!profile) return res.status(404).json({ status: false, message: 'Profile Not found' });
         profile.profileImageUrl = req.file ? req.file.location : null;
         await profile.save();

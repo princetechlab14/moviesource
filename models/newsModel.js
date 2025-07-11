@@ -1,48 +1,23 @@
-module.exports = (sequelize, DataTypes) => {
-    const News = sequelize.define("news", {
-        id: {
-            type: DataTypes.UUID,
-            defaultValue: DataTypes.UUIDV4,
-            primaryKey: true,
-            allowNull: false,
-        },
-        creatorId: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        title: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        description: {
-            type: DataTypes.TEXT,
-            allowNull: true
-        },
-        body: {
-            type: DataTypes.TEXT,
-            allowNull: true
-        },
-        category: {
-            type: DataTypes.ENUM("Movie", "Highlight", "Thank you", "News"),
-            allowNull: false,
-            defaultValue: "News"
-        },
-        keywords: {
-            type: DataTypes.JSON,
-            allowNull: true
-        },
-        image: {
-            type: DataTypes.JSON,
-            allowNull: true
-        },
-        video: {
-            type: DataTypes.JSON,
-            allowNull: true
-        }
-    }, {
-        tableName: "news",
-        timestamps: true
-    });
+const mongoose = require('mongoose');
+const { v4: uuidv4 } = require('uuid');
 
-    return News;
-};
+const NewsSchema = new mongoose.Schema({
+    id: { type: String, default: uuidv4, unique: true },
+    creatorId: { type: String, default: null },
+    title: { type: String, default: null },
+    description: { type: String, default: null },
+    body: { type: String, default: null },
+    category: {
+        type: String,
+        enum: ["Movie", "Highlight", "Thank you", "News"],
+        default: "News"
+    },
+    keywords: { type: Array, default: [] },
+    image: { type: Object, default: null },
+    video: { type: Object, default: null }
+}, {
+    collection: "news",
+    timestamps: true
+});
+
+module.exports = mongoose.model('News', NewsSchema);

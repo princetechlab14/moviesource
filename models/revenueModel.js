@@ -1,37 +1,19 @@
-module.exports = (sequelize, DataTypes) => {
-    const Revenue = sequelize.define("revenue", {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true,
-            allowNull: false,
-        },
-        userId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        revenueStream: {
-            type: DataTypes.ENUM('digitalGoods', 'subscription', 'rent', 'buy'),
-            allowNull: false,
-        },
-        amount: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            defaultValue: 0,
-        },
-        date: {
-            type: DataTypes.DATE,
-            allowNull: true,
-        },
-        isRecurring: {
-            type: DataTypes.BOOLEAN,
-            allowNull: false,
-            defaultValue: false,
-        }
-    }, {
-        tableName: 'revenue',
-        timestamps: false
-    });
+const mongoose = require('mongoose');
 
-    return Revenue;
-};
+const RevenueSchema = new mongoose.Schema({
+    id: { type: Number, unique: true },
+    userId: { type: Number, required: true },
+    revenueStream: {
+        type: String,
+        enum: ['digitalGoods', 'subscription', 'rent', 'buy'],
+        required: true
+    },
+    amount: { type: Number, required: true, default: 0 },
+    date: { type: Date, default: null },
+    isRecurring: { type: Boolean, required: true, default: false }
+}, {
+    timestamps: false,
+    collection: 'revenue'
+});
+
+module.exports = mongoose.model('Revenue', RevenueSchema);
