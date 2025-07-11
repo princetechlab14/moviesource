@@ -29,8 +29,8 @@ const handlePostReaction = async (req, res) => {
         const { error } = reactionSchema.validate(body);
         if (error) return res.status(400).json({ message: error.details[0].message });
 
-        await ReactionModel.create(body); // Use `.create()` instead of `.insert()` in Mongoose
-        return res.status(200).json(true);
+        const reaction = await ReactionModel.create(body); 
+        return res.status(200).json(reaction);
 
     } catch (err) {
         console.error('POST /api/reaction failed:', err);
