@@ -61,7 +61,13 @@ const uploadPicture = async (req, res) => {
     try {
         const profile = await ProfileModel.findById(id);
         if (!profile) return res.status(404).json({ status: false, message: 'Profile Not found' });
-        profile.profileImageUrl = req.file ? req.file.location : null;
+        const isAWS = process.env.FILE_STORAGE === "aws";
+        const imageUrl = req.file
+            ? isAWS
+                ? req.file.location
+                : `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+            : null;
+        profile.profileImageUrl = imageUrl;
         await profile.save();
         return res.status(200).json(profile);
     } catch (e) {

@@ -88,7 +88,13 @@ const uploadMovie = async (req, res) => {
     try {
         const movies = await MovieModel.findById(movieId);
         if (!movies) return res.status(404).json({ status: false, message: 'Movie Not found' });
-        movies.originalUrl = req.file ? req.file.location : null;
+        const isAWS = process.env.FILE_STORAGE === "aws";
+        const imageUrl = req.file
+            ? isAWS
+                ? req.file.location
+                : `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`
+            : null;
+        movies.originalUrl = imageUrl;
         await movies.save();
         return res.status(200).json(movies);
     } catch (e) {

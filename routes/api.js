@@ -10,8 +10,10 @@ const productController = require('../controller/api/productController');
 const emojiController = require('../controller/api/emojiController');
 const reactionController = require('../controller/api/reactionController');
 const reportedContentController = require('../controller/api/reportedContentController');
+const postController = require('../controller/api/postController');
 const { upload } = require('../services/fileupload');
 const { authenticateToken } = require('../middleware/auth.middleware');
+const { handleMulterErrors } = require('../middleware/uploadHandler');
 
 router.get('/', function (req, res, next) { return res.json('respond with a resource'); });
 
@@ -23,7 +25,7 @@ router.post('/user/signin', userController.SignIn);
 router.post('/profile/create', authenticateToken, profileController.create);
 router.put('/profile/update', authenticateToken, profileController.update);
 router.get('/profile/:creatorId', authenticateToken, profileController.getProfile);
-router.post('/profile/upload/:id', upload.single('profileImageUrl'), authenticateToken, profileController.uploadPicture);
+router.post('/profile/upload/:id', authenticateToken, handleMulterErrors(upload.single('profileImageUrl')), profileController.uploadPicture);
 
 // UploadService
 router.get('/movie/:userId', authenticateToken, movieController.getMyMovies);
@@ -32,7 +34,7 @@ router.delete('/movie/:id', authenticateToken, movieController.deleteMovieByPara
 
 router.get('/upload', authenticateToken, movieController.getAll);
 router.put('/upload', authenticateToken, movieController.update);
-router.post('/upload/:movieId', upload.single('movie'), authenticateToken, movieController.uploadMovie);
+router.post('/upload/:movieId', authenticateToken, handleMulterErrors(upload.single('movie')), movieController.uploadMovie);
 router.delete('/upload', authenticateToken, movieController.deleteMovieByQuery);
 router.get('/upload/thankyou/:userId', authenticateToken, movieController.getThankYouMovie);
 
@@ -59,5 +61,15 @@ router.get('/emoji/:userId', authenticateToken, emojiController.getUserEmojis);
 
 // ReportedContentService
 router.post('/contentmoderation', authenticateToken, reportedContentController.reportContent);
+
+// Post
+router.get('/post', authenticateToken, postController.getAllPosts);
+router.get('/post/:postId', authenticateToken, postController.getPostById);
+router.post('/post/:userId', authenticateToken, handleMulterErrors(upload.fields([{ name: 'image', maxCount: 5 }, { name: 'video', maxCount: 2 }])), postController.createPost);
+router.put('/post/:postId/media', authenticateToken, handleMulterErrors(upload.fields([{ name: 'image', maxCount: 5 }, { name: 'video', maxCount: 2 }])), postController.updatePost);
+router.delete('/post/:postId', authenticateToken, postController.deletePost);
+router.post('/post/:postId/like', authenticateToken, postController.toggleLikePost);
+router.post('/post/:postId/share', authenticateToken, postController.toggleSharePost);
+router.delete('/post/:postId/media', authenticateToken, postController.deletePostMedia);
 
 module.exports = router;

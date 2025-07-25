@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const CONNECTION_URL = process.env.MONGO_URL;
 
 mongoose.connect(CONNECTION_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+    // useNewUrlParser: true,
+    // useUnifiedTopology: true,
 })
     .then(() => console.log("MongoDB connected"))
     .catch((err) => console.error("MongoDB connection error:", err));
@@ -26,5 +26,6 @@ db.ReactionModel = require('./reactionModel');
 db.ReportedContentModel = require('./reportedContentModel');
 db.RevenueModel = require('./revenueModel');
 db.StripeAccountModel = require('./stripeAccountModel');
+db.PostModel = require('./PostModel');
 
 module.exports = db;
