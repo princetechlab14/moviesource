@@ -7,7 +7,19 @@ mongoose.connect(CONNECTION_URL, {
     // useNewUrlParser: true,
     // useUnifiedTopology: true,
 })
-    .then(() => console.log("MongoDB connected"))
+    .then(async () => {
+        console.log("MongoDB connected")
+        // try {
+        //     const indexes = await mongoose.connection.db.collection("users").indexes();
+        //     const hasWrongIndex = indexes.some(idx => idx.name === "id_1");
+        //     if (hasWrongIndex) {
+        //         await mongoose.connection.db.collection("users").dropIndex("id_1");
+        //         console.log("🗑️ Dropped bad index: id_1");
+        //     }
+        // } catch (err) {
+        //     console.error("⚠️ Failed to check/drop index:", err.message);
+        // }
+    })
     .catch((err) => console.error("MongoDB connection error:", err));
 
 const db = {};
